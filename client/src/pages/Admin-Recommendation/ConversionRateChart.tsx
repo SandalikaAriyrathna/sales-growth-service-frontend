@@ -1,6 +1,6 @@
-import { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
 
 const options: ApexOptions = {
   legend: {
@@ -102,24 +102,51 @@ const options: ApexOptions = {
   },
 };
 
-interface ConversionRateChartState {
-  series: {
-    name: string;
-    data: number[];
-  }[];
-}
-
-const ConversionRateChart: React.FC = () => {
-  const [state, setState] = useState<ConversionRateChartState>({
-    series: [
-      {
-        name: 'Trial Conversion Rate',
-        data: [0.02, 0.03, 0.04, 0.06, 0.08, 0.1, 0.1],
+const ConversionRateChart = () => {
+  const [chartData, setChartData] = useState({
+    series: [{
+      name: 'Conversion Rate',
+      data: []  // Data will be an array of conversion rates
+    }],
+    options: {
+      chart: {
+        type: 'line',
+        height: 350
       },
-
-    
-    ],
+      xaxis: {
+        categories: []  // Categories will be an array of months
+      },
+      yaxis: {
+        title: {
+          text: 'Conversion Rate (%)'
+        }
+      },
+      stroke: {
+        curve: 'smooth'
+      },
+      // Add more chart options as needed
+    }
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch('http://localhost:8000/conversion-rates/');
+      const data = await response.json();
+      const months = data.map(entry => entry.month);
+      const rates = data.map(entry => entry.conversion_rate);
+      
+      setChartData(prevState => ({
+        ...prevState,
+        series: [{ name: 'Conversion Rate', data: rates }],
+        options: {
+          ...prevState.options,
+          xaxis: { categories: months }
+        }
+      }));
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -139,14 +166,15 @@ const ConversionRateChart: React.FC = () => {
       </div>
 
       <div>
-        <div id="ConversionRateChart" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={state.series}
-            type="area"
-            height={350}
-          />
-        </div>
+       
+        <div id="ConversionRateChart"  className="-ml-5">
+      <ReactApexChart
+        options={chartData.options}
+        series={chartData.series}
+        type="area"
+        height={350}
+      />
+    </div>
       </div>
     </div>
   );
