@@ -65,9 +65,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/">
-          {/* SGOS */}
+          {/* QuixellAI */}
           {/* use hover color yellow and text-center*/}
-          <h1 className="text-2xl font-bold text-white">E-Com SGO Service</h1>
+          <h1 className="text-2xl font-bold text-white">QuixellAI</h1>
         </NavLink>
 
         <button
