@@ -1,5 +1,5 @@
 {
-  "name": "tailadmin-react-free",
+  "name": "QuixellAI",
   "private": true,
   "version": "1.0.5",
   "type": "module",
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "author": {
-    "name": "TailAdmin",
-    "email": "hello@tailadmin.com",
-    "url": "https://tailadmin.com"
+    "name": "QuixellAI",
+    "email": "hello@quixellai.com",
+    "url": "https://quixellai.com"
   },
   "dependencies": {
     "apexcharts": "^3.41.0",
