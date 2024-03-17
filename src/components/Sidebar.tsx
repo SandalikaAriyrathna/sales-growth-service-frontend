@@ -67,7 +67,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         <NavLink to="/">
           {/* QuixellAI */}
           {/* use hover color yellow and text-center*/}
-          <h1 className="text-2xl font-bold text-white">QuixellAI</h1>
+          <h1 className="text-3xl font-bold">
+    <span className="inline-block px-2 py-1 bg-lightblue rounded-md transition duration-300 border border-blue-500 hover:border-yellow-500">
+        QuixellAI
+    </span>
+</h1>
+
         </NavLink>
 
         <button
