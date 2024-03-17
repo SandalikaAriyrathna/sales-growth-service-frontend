@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConversionRateChart from './ConversionRateChart';
+import DataTable from './DataTable';
 
 const fetchMetrics = async (metric) => {
   const response = await fetch(`http://localhost:8000/tracking/metrics/${metric}`);
@@ -28,7 +29,7 @@ const RecommendationDashboard = () => {
 
   return (
     <>
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5 mb-5">
 {/*  */}
       <div className="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
@@ -138,7 +139,11 @@ const RecommendationDashboard = () => {
     {/* chart goes here */}
     <ConversionRateChart/>
     {/*  */}
+    {/*  */}
+  
+    {/*  */}
     </div>
+    <DataTable/>
     </>
   );
 };
