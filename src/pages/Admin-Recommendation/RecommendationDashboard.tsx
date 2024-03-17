@@ -3,7 +3,7 @@ import ConversionRateChart from './ConversionRateChart';
 import DataTable from './DataTable';
 
 const fetchMetrics = async (metric) => {
-  const response = await fetch(`http://localhost:8000/tracking/metrics/${metric}`);
+  const response = await fetch(`http://localhost:8000/metrics/${metric}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
