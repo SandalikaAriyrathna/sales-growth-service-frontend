@@ -8,8 +8,13 @@ const Settings = lazy(() => import('../pages/Settings'));
 const Tables = lazy(() => import('../pages/Tables'));
 const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
-const RecommendationDashboard = lazy(() => import('../pages/Admin-Recommendation/RecommendationDashboard'));
+const RecommendationDashboard = lazy(
+  () => import('../pages/Admin-Recommendation/RecommendationDashboard'),
+);
 const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
+const PriceOptimizationConfig = lazy(
+  () => import('../pages/PriceOptimization/PriceOptimizationConfig'),
+);
 
 const coreRoutes = [
   {
@@ -66,6 +71,11 @@ const coreRoutes = [
     path: '/data-stock',
     title: 'Data Stock',
     component: DataStock,
+  },
+  {
+    path: '/price',
+    title: 'Price Optimization',
+    component: PriceOptimizationConfig,
   },
 ];
 
