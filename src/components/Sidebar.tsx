@@ -72,7 +72,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
             {/* Text */}
             <h1 className="text-2xl lg:text-4xl font-bold">
-                <span className="inline-block px-2 py-1 bg-blue rounded-md transition duration-300 border border-blue-500 hover:border-yellow-500 text-center">
+            <span className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1' }}>
                     QuixellAI
                 </span>
             </h1>
