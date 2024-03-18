@@ -9,6 +9,7 @@ const Tables = lazy(() => import('../pages/Tables'));
 const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const RecommendationDashboard = lazy(() => import('../pages/Admin-Recommendation/RecommendationDashboard'));
+const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
 
 const coreRoutes = [
   {
@@ -60,6 +61,11 @@ const coreRoutes = [
     path: '/recommendations',
     title: 'Recommendations',
     component: RecommendationDashboard,
+  },
+  {
+    path: '/data-stock',
+    title: 'Data Stock',
+    component: DataStock,
   },
 ];
 

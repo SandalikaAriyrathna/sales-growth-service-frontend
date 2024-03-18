@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import Logo from '../images/logo/logo.png';
+import LogoDark from '../images/logo/logo.png';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -67,11 +68,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         <div className="flex items-center gap-2">
             {/* Image */}
-            <img className="hidden dark:block h-10 w-10 lg:h-12 lg:w-12" src={Logo} alt="Logo" />
+            <img className="dark:block h-10 w-10 lg:h-12 lg:w-12" src={Logo} alt="Logo" />
 
             {/* Text */}
             <h1 className="text-2xl lg:text-4xl font-bold">
-                <span className="inline-block px-2 py-1 bg-lightblue rounded-md transition duration-300 border border-blue-500 hover:border-yellow-500 text-center">
+                <span className="inline-block px-2 py-1 bg-blue rounded-md transition duration-300 border border-blue-500 hover:border-yellow-500 text-center">
                     QuixellAI
                 </span>
             </h1>

@@ -132,12 +132,16 @@ const ConversionRateChart = () => {
     const fetchData = async () => {
       const response = await fetch('http://localhost:8000/conversion-rates/');
       const data = await response.json();
-      const months = data.map(entry => entry.month);
+      const months = data.map(entry => entry.month_name);
       const rates = data.map(entry => entry.conversion_rate);
+      const total_trials = data.map(entry => entry.total_trials);
+      const total_conversions = data.map(entry => entry.total_conversions);
       
       setChartData(prevState => ({
         ...prevState,
-        series: [{ name: 'Conversion Rate', data: rates }],
+        series: [{ name: 'Conversion Rate', data: rates},
+                 { name: 'Total Trials', data: total_trials},
+                 { name: 'Total Conversions', data: total_conversions}],
         options: {
           ...prevState.options,
           xaxis: { categories: months }
