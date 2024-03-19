@@ -11,6 +11,7 @@ interface ChartData {
 
 const SalesChart: React.FC = () => {
   const [series, setSeries] = useState<ChartData[]>([]);
+  // const [notification, setNotification] = useState('');
   const chartRef = useRef(null); // Ref for the chart container
   const [options, setOptions] = useState({
     legend: {
@@ -108,10 +109,28 @@ const SalesChart: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const rawData = await response.json();
-        const transformedData = rawData.map((item: any) => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
+        // const transformedData = rawData.map((item: any) => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
         
+        // setSeries([{ name: 'Total Sales', data: transformedData }]);
+         // Assuming last entry is the predicted sales
+         const actualSalesData = rawData.slice(0, -1); // all but the last entry
+         const predictedSalesData = rawData[rawData.length - 1]; // last entry
+
+         // Calculate mean of actual sales
+        const meanActualSales = actualSalesData.reduce((sum, record) => sum + record.total_sales, 0) / actualSalesData.length;
+        // Check if predicted sales is significantly higher or lower than the mean
+        const threshold = 0.1; // e.g., 10%
+        if (predictedSalesData.total_sales < meanActualSales * (1 - threshold)) {
+          alert('The predicted sales for the upcoming month is significantly lower than the average.');
+        } else if (predictedSalesData.total_sales > meanActualSales * (1 + threshold)) {
+          alert('The predicted sales for the upcoming month is significantly higher than the average.');
+        }
+
+        // Transform data for chart
+        const transformedData = rawData.map(item => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
         setSeries([{ name: 'Total Sales', data: transformedData }]);
 
+        
         // Update options to highlight the last point
         setOptions(prevOptions => ({
           ...prevOptions,
