@@ -4,10 +4,16 @@ import ButtonView from '../../components/ButtonView';
 import ButtonDelete from '../../components/ButtonDelete';
 import Breadcrumb from '../../components/Breadcrumb';
 import axios from 'axios';
+import moment from 'moment';
+import toast from 'react-hot-toast';
 
 const Products = () => {
   const [showModal, setShowModal] = React.useState(false);
-  const [modalData, setModalData] = React.useState(false);
+  const [modalData, setModalData] = React.useState([]);
+  const [optimumPrice, setOptimumPrice] = React.useState(0);
+  const [maxMargin, setMaxMargin] = React.useState(0);
+  const [minMargin, setMinMargin] = React.useState(0);
+
   const [headings, setHeadings] = useState([
     {
       title: 'Product ID',
@@ -37,8 +43,25 @@ const Products = () => {
 
   const [data, setData] = useState([]);
 
+  const saveProduct = async (id: any) => {
+    await axios
+      .put(import.meta.env.VITE_API_URL + 'products/' + id, {
+        max_margin: maxMargin,
+        min_margin: minMargin,
+        selling_price: optimumPrice,
+      })
+      .then((response) => {
+        toast.success('Product updated successfully');
+        setShowModal(false);
+        getAllProducts();
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error occured while updating product');
+      });
+  };
+
   const getAllProducts = async () => {
-    console.log(import.meta.env.VITE_API_URL);
     await axios
       .get(import.meta.env.VITE_API_URL + 'products')
       .then((response) => {
@@ -46,7 +69,7 @@ const Products = () => {
           return {
             productId: product[1],
             productName: product[2],
-            productCost: product[5],
+            productCost: parseFloat(product[5] ?? 0).toFixed(2),
             maxProfitMargin: product[7],
             minProfitMargin: product[8],
             action: (
@@ -54,10 +77,13 @@ const Products = () => {
                 <ButtonView
                   onClick={() => {
                     setShowModal(true);
-                    setModalData(product[0]);
+                    setModalData(product);
+                    setOptimumPrice(product[6] ?? 0);
+                    setMaxMargin(product[7] ?? 0);
+                    setMinMargin(product[8] ?? 0);
                   }}
                 />
-                <ButtonDelete onClick={() => console.log(product)} />
+                {/* <ButtonDelete onClick={() => console.log(product)} /> */}
               </div>
             ),
           };
@@ -69,6 +95,27 @@ const Products = () => {
   useEffect(() => {
     getAllProducts();
   }, []);
+
+  const getOptimumPrice = async () => {
+    var now = new Date();
+    await axios
+      .post(import.meta.env.VITE_API_URL + 'optimize', {
+        product: modalData[2],
+        product_category: modalData[3],
+        cost: modalData[5],
+        date: moment(now).format('YYYY-MM-DD'),
+        maxProfitMargin: maxMargin,
+        minProfitMargin: minMargin,
+      })
+      .then((response) => {
+        toast.success('Optimum price calculated');
+        setOptimumPrice(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error('Error occured while calculating optimum price');
+      });
+  };
 
   return (
     <>
@@ -94,13 +141,13 @@ const Products = () => {
       </div>
       {showModal ? (
         <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none ">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed bg-[#ffffff40]  inset-0 z-[10000] outline-none focus:outline-none ">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl opacity-100">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white dark:bg-boxdark outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
-                  <h3 className="text-3xl font-semibold">Modal Title</h3>
+                  <h3 className="text-3xl font-semibold">{modalData[2]}</h3>
                   <button
                     className="p-1 ml-auto float-right text-3xl font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
@@ -112,31 +159,121 @@ const Products = () => {
                 <div className="relative p-6 flex-auto">
                   <div className="container mx-auto px-4 py-8">
                     <div className="flex flex-wrap">
-                      <div className="w-full md:w-1/2 lg:w-2/3 px-4">
-                        <div className="mb-4">
-                          <h2 className="text-xl font-bold">Product Name</h2>
-                          <p className="text-gray-500">Brand</p>
+                      <div className="w-full px-4">
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Product ID :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {modalData[1]}
+                            </h3>
+                          </label>
                         </div>
-                        <div className="mb-4">
-                          <h3 className="text-xl font-bold">Category</h3>
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Product Name :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {modalData[2]}
+                            </h3>
+                          </label>
+                        </div>
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Brand :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {modalData[4]}
+                            </h3>
+                          </label>
+                        </div>
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Catogary :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {modalData[3]}
+                            </h3>
+                          </label>
+                        </div>
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Cost :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {parseFloat(modalData[5] ?? 0).toFixed(2)}
+                            </h3>
+                          </label>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="text-gray-700">
-                            <p>Specification Type</p>
-                            <p>2DIN Placement</p>
-                            <p>Type</p>
+                          <div className="w-full">
+                            <label className="mb-3 block text-black dark:text-white">
+                              Minimum margin
+                            </label>
+                            <div className="flex flex-row">
+                              <input
+                                type="number"
+                                placeholder="0"
+                                value={minMargin}
+                                onChange={(e) => {
+                                  setMinMargin(
+                                    e.target.value as unknown as number,
+                                  );
+                                }}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                              />
+                              <span className="flex items-center pl-2 pr-5">
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-full">
+                            <label className="mb-3 block text-black dark:text-white">
+                              Maximum margin
+                            </label>
+                            <div className="flex flex-row">
+                              <input
+                                type="number"
+                                placeholder="0"
+                                value={maxMargin}
+                                onChange={(e) => {
+                                  setMaxMargin(
+                                    e.target.value as unknown as number,
+                                  );
+                                }}
+                                className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                              />
+                              <span className="flex items-center pl-2 pr-5">
+                                %
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <div className="w-full mt-5">
+                          <label className="mb-3 block text-black dark:text-white">
+                            Selling Price
+                          </label>
+                          <input
+                            type="number"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              setOptimumPrice(
+                                e.target.value as unknown as number,
+                              );
+                            }}
+                            value={(optimumPrice ?? 0).toFixed(2)}
+                            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                          />
+                        </div>
                         <div className="flex justify-between items-center mt-4">
-                          <div className="text-xl font-bold">
-                            $<span className="current-price">1560.00</span>
-                          </div>
+                          <p className=" text-xl font-bold text-gray-500 line-through mr-2">
+                            <span className="original-price">
+                              {optimumPrice != modalData[6]
+                                ? parseFloat(modalData[6] ?? 0).toFixed(2)
+                                : ''}
+                            </span>
+                          </p>
                           <div className="flex items-center">
-                            <p className="text-gray-500 line-through mr-2">
-                              $<span className="original-price">1653.00</span>
-                            </p>
-                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                              Save
+                            <button
+                              onClick={() => getOptimumPrice()}
+                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            >
+                              Optimum Price
                             </button>
                           </div>
                         </div>
@@ -156,7 +293,7 @@ const Products = () => {
                   <button
                     className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => saveProduct(modalData[0])}
                   >
                     Save Changes
                   </button>
