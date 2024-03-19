@@ -52,6 +52,16 @@ const Products = () => {
             </span>
           </div>
         </div>
+        <div className="mb-4.5">
+          <label className="mb-2.5 block text-black dark:text-white">
+            Callback URL
+          </label>
+          <input
+            type="text"
+            placeholder="https://example.com/callback"
+            className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+          />
+        </div>
       </div>
     </>
   );

@@ -15,6 +15,7 @@ const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
 const PriceOptimizationConfig = lazy(
   () => import('../pages/PriceOptimization/PriceOptimizationConfig'),
 );
+const Products = lazy(() => import('../pages/Common/Products'));
 
 const coreRoutes = [
   {
@@ -76,6 +77,11 @@ const coreRoutes = [
     path: '/price',
     title: 'Price Optimization',
     component: PriceOptimizationConfig,
+  },
+  {
+    path: '/products',
+    title: 'Products',
+    component: Products,
   },
 ];
 
