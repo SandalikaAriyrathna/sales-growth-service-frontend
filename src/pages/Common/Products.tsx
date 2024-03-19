@@ -121,7 +121,7 @@ const Products = () => {
     <>
       <Breadcrumb pageName="Products" />
       <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-        <button className="flex items-center gap-2 rounded bg-primary py-2 px-4.5 font-medium text-white hover:bg-opacity-80">
+        {/* <button className="flex items-center gap-2 rounded bg-primary py-2 px-4.5 font-medium text-white hover:bg-opacity-80">
           <svg
             className="fill-current"
             width="16"
@@ -136,7 +136,7 @@ const Products = () => {
             />
           </svg>
           Add task
-        </button>
+        </button> */}
         <DataTable headings={headings} data={data} />
       </div>
       {showModal ? (
@@ -256,16 +256,16 @@ const Products = () => {
                                 e.target.value as unknown as number,
                               );
                             }}
-                            value={(optimumPrice ?? 0).toFixed(2)}
+                            value={optimumPrice}
                             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                           />
                         </div>
                         <div className="flex justify-between items-center mt-4">
                           <p className=" text-xl font-bold text-gray-500 line-through mr-2">
                             <span className="original-price">
-                              {optimumPrice != modalData[6]
-                                ? parseFloat(modalData[6] ?? 0).toFixed(2)
-                                : ''}
+                              {optimumPrice == modalData[6]
+                                ? ''
+                                : parseFloat(modalData[6] ?? 0).toFixed(2)}
                             </span>
                           </p>
                           <div className="flex items-center">
