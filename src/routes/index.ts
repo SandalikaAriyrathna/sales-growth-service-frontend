@@ -9,6 +9,7 @@ const Tables = lazy(() => import('../pages/Tables'));
 const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const RecommendationDashboard = lazy(() => import('../pages/Admin-Recommendation/RecommendationDashboard'));
+const FuturePredictionDashboard = lazy(() => import('../pages/Admin-SalesForecasting/FuturePredictionDashboard'));
 const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
 
 const coreRoutes = [
@@ -61,6 +62,11 @@ const coreRoutes = [
     path: '/recommendations',
     title: 'Recommendations',
     component: RecommendationDashboard,
+  },
+  {
+    path: '/forecast',
+    title: 'FuturePredictionDashboard',
+    component: FuturePredictionDashboard,
   },
   {
     path: '/data-stock',
