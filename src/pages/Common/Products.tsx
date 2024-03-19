@@ -3,6 +3,7 @@ import DataTable from '../../components/DataTable';
 import ButtonView from '../../components/ButtonView';
 import ButtonDelete from '../../components/ButtonDelete';
 import Breadcrumb from '../../components/Breadcrumb';
+import axios from 'axios';
 
 const Products = () => {
   const [headings, setHeadings] = useState([
@@ -54,6 +55,33 @@ const Products = () => {
       ),
     },
   ]);
+
+  const getAllProducts = async () => {
+    console.log(import.meta.env.VITE_API_URL);
+    await axios
+      .get(import.meta.env.VITE_API_URL + 'products')
+      .then((response) => {
+        const products = response.data.map((product: any) => {
+          return {
+            productName: product[2],
+            productCost: product[],
+            maxProfitMargin: product.maxProfitMargin,
+            minProfitMargin: product.minProfitMargin,
+            action: (
+              <div className="flex items-center space-x-3.5">
+                <ButtonView onClick={() => console.log('click')} />
+                <ButtonDelete onClick={() => console.log('click')} />
+              </div>
+            ),
+          };
+        });
+        setData(products);
+      });
+  };
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
 
   return (
     <>
