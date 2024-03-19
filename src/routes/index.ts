@@ -10,7 +10,10 @@ const Alerts = lazy(() => import('../pages/UiElements/Alerts'));
 const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const RecommendationDashboard = lazy(() => import('../pages/Admin-Recommendation/RecommendationDashboard'));
 const FuturePredictionDashboard = lazy(() => import('../pages/Admin-SalesForecasting/FuturePredictionDashboard'));
+const SalesbyProductCategory = lazy(() => import('../pages/Admin-SalesForecasting/SalesbyProductCategory'));
 const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
+
+
 
 const coreRoutes = [
   {
@@ -67,6 +70,11 @@ const coreRoutes = [
     path: '/forecast',
     title: 'FuturePredictionDashboard',
     component: FuturePredictionDashboard,
+  },
+  {
+    path: '/SalesbyProductCategory',
+    title: 'SalesbyProductCategory',
+    component: SalesbyProductCategory,
   },
   {
     path: '/data-stock',
