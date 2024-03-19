@@ -6,7 +6,13 @@ import Breadcrumb from '../../components/Breadcrumb';
 import axios from 'axios';
 
 const Products = () => {
+  const [showModal, setShowModal] = React.useState(false);
+  const [modalData, setModalData] = React.useState(false);
   const [headings, setHeadings] = useState([
+    {
+      title: 'Product ID',
+      key: 'productId',
+    },
     {
       title: 'Product Name',
       key: 'productName',
@@ -29,32 +35,7 @@ const Products = () => {
     },
   ]);
 
-  const [data, setData] = useState([
-    {
-      productName: 'Product 1',
-      productCost: 100,
-      maxProfitMargin: 20,
-      minProfitMargin: 10,
-      action: (
-        <div className="flex items-center space-x-3.5">
-          <ButtonView onClick={() => console.log('click')} />
-          <ButtonDelete onClick={() => console.log('click')} />
-        </div>
-      ),
-    },
-    {
-      productName: 'Product 2',
-      productCost: 200,
-      maxProfitMargin: 30,
-      minProfitMargin: 15,
-      action: (
-        <div className="flex items-center space-x-3.5">
-          <ButtonView onClick={() => console.log('click')} />
-          <ButtonDelete onClick={() => console.log('click')} />
-        </div>
-      ),
-    },
-  ]);
+  const [data, setData] = useState([]);
 
   const getAllProducts = async () => {
     console.log(import.meta.env.VITE_API_URL);
@@ -63,14 +44,20 @@ const Products = () => {
       .then((response) => {
         const products = response.data.map((product: any) => {
           return {
+            productId: product[1],
             productName: product[2],
-            productCost: product[],
-            maxProfitMargin: product.maxProfitMargin,
-            minProfitMargin: product.minProfitMargin,
+            productCost: product[5],
+            maxProfitMargin: product[7],
+            minProfitMargin: product[8],
             action: (
               <div className="flex items-center space-x-3.5">
-                <ButtonView onClick={() => console.log('click')} />
-                <ButtonDelete onClick={() => console.log('click')} />
+                <ButtonView
+                  onClick={() => {
+                    setShowModal(true);
+                    setModalData(product[0]);
+                  }}
+                />
+                <ButtonDelete onClick={() => console.log(product)} />
               </div>
             ),
           };
@@ -105,6 +92,81 @@ const Products = () => {
         </button>
         <DataTable headings={headings} data={data} />
       </div>
+      {showModal ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none ">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white dark:bg-boxdark outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t">
+                  <h3 className="text-3xl font-semibold">Modal Title</h3>
+                  <button
+                    className="p-1 ml-auto float-right text-3xl font-semibold outline-none focus:outline-none"
+                    onClick={() => setShowModal(false)}
+                  >
+                    <span className=" dark:text-gray">×</span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex-auto">
+                  <div className="container mx-auto px-4 py-8">
+                    <div className="flex flex-wrap">
+                      <div className="w-full md:w-1/2 lg:w-2/3 px-4">
+                        <div className="mb-4">
+                          <h2 className="text-xl font-bold">Product Name</h2>
+                          <p className="text-gray-500">Brand</p>
+                        </div>
+                        <div className="mb-4">
+                          <h3 className="text-xl font-bold">Category</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="text-gray-700">
+                            <p>Specification Type</p>
+                            <p>2DIN Placement</p>
+                            <p>Type</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-4">
+                          <div className="text-xl font-bold">
+                            $<span className="current-price">1560.00</span>
+                          </div>
+                          <div className="flex items-center">
+                            <p className="text-gray-500 line-through mr-2">
+                              $<span className="original-price">1653.00</span>
+                            </p>
+                            <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/*footer*/}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
+                  <button
+                    className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
     </>
   );
 };
