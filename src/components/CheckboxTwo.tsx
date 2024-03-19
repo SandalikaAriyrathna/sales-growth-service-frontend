@@ -1,18 +1,19 @@
 import { useState } from 'react';
 
-const CheckboxTwo = () => {
+const CheckboxTwo = (props?: any) => {
+  const { label = 'Default Label', name = 'default_name' } = props;
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   return (
     <div>
       <label
-        htmlFor="checkboxLabelTwo"
+        htmlFor={name}
         className="flex cursor-pointer select-none items-center"
       >
         <div className="relative">
           <input
             type="checkbox"
-            id="checkboxLabelTwo"
+            id={name}
             className="sr-only"
             onChange={() => {
               setIsChecked(!isChecked);
@@ -41,7 +42,7 @@ const CheckboxTwo = () => {
             </span>
           </div>
         </div>
-        Checkbox Text
+        {label}
       </label>
     </div>
   );
