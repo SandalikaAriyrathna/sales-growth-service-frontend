@@ -11,6 +11,9 @@ const Buttons = lazy(() => import('../pages/UiElements/Buttons'));
 const RecommendationDashboard = lazy(
   () => import('../pages/Admin-Recommendation/RecommendationDashboard'),
 );
+const FuturePredictionDashboard = lazy(
+  () => import('../pages/Admin-SalesForecasting/FuturePredictionDashboard'),
+);
 const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
 const PriceOptimizationConfig = lazy(
   () => import('../pages/PriceOptimization/PriceOptimizationConfig'),
@@ -67,6 +70,11 @@ const coreRoutes = [
     path: '/recommendations',
     title: 'Recommendations',
     component: RecommendationDashboard,
+  },
+  {
+    path: '/forecast',
+    title: 'FuturePredictionDashboard',
+    component: FuturePredictionDashboard,
   },
   {
     path: '/data-stock',
