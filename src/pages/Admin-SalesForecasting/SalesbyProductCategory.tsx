@@ -19,94 +19,95 @@ const SalesByProductCategory = () => {
     '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF',
   ];
 
-  const [chartOptions, setChartOptions] = useState({
-    colors: colors,
-    chart: {
-        type: 'pie',
-    },
-    labels: [],
-    legend: {
-        position: 'bottom',
-        horizontalAlign: 'center',
-    },
-    responsive: [{
-        breakpoint: 480,
-        options: {
-            legend: {
-                position: 'bottom'
+   const [chartOptions, setChartOptions] = useState({
+        colors: colors,
+        chart: {
+            type: 'pie',
+        },
+        labels: [],
+        legend: {
+            position: 'bottom',
+            horizontalAlign: 'center',
+        },
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                legend: {
+                    position: 'bottom'
+                }
             }
-        }
-    }],
-    dataLabels: {
-        enabled: true,
-    },
-    tooltip: {
-        y: {
-            formatter: (value) => `$${value.toFixed(2)}`
-        }
-    },
-    plotOptions: {
-        pie: {
-            expandOnClick: true
-        }
-    },
-});
-const [chartSeries, setChartSeries] = useState([]);
+        }],
+        dataLabels: {
+            enabled: true,
+        },
+        tooltip: {
+            y: {
+                formatter: (value) => `$${value.toFixed(2)}`
+            }
+        },
+        plotOptions: {
+            pie: {
+                expandOnClick: true
+            }
+        },
+    });
+    const [chartSeries, setChartSeries] = useState([]);
 
-const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/v1/sales-forecasting/category-sales');
-            const data = await response.json();
-            setChartOptions(prevOptions => ({
-                ...prevOptions,
-                labels: data.map(item => item.product_category)
-            }));
-            setChartSeries(data.map(item => item.total_sales));
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setIsLoading(false);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/v1/sales-forecasting/category-sales');
+                const data = await response.json();
+                setChartOptions(prevOptions => ({
+                    ...prevOptions,
+                    labels: data.map(item => item.product_category)
+                }));
+                setChartSeries(data.map(item => item.total_sales));
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const downloadPdf = () => {
+        if (chartRef.current) {
+            html2canvas(chartRef.current).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                });
+                pdf.addImage(imgData, 'PNG', 10, 10, 280, 150);
+                pdf.save('sales-by-product-category.pdf');
+            });
         }
     };
 
-    fetchData();
-}, []);
-
-const downloadPdf = () => {
-    if (chartRef.current) {
-        html2canvas(chartRef.current).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-            });
-            pdf.addImage(imgData, 'PNG', 10, 10, 280, 150);
-            pdf.save('sales-by-product-category.pdf');
-        });
-    }
-};
-
-return (
-    <div ref={chartRef} className="chart-container">
-        <h2>Sales by Product Category</h2>
-        {isLoading ? (
-            <p>Loading...</p>
-        ) : (
-            <>
-                <ReactApexChart
-                    options={chartOptions}
-                    series={chartSeries}
-                    type="pie"
-                    width="80%"
-                />
-                <button onClick={downloadPdf}>Download PDF</button>
-            </>
-        )}
-        
-    </div>
-);
+    return (
+        <div ref={chartRef} className="chart-container">
+            <h1 className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1' }}>Sales by Product Category</h1>
+            {isLoading ? (
+                <p>Loading...</p>
+            ) : (
+                <>
+                    <ReactApexChart
+                        options={chartOptions}
+                        series={chartSeries}
+                        type="pie"
+                        width="80%"
+                    />
+                    <button onClick={downloadPdf} className="inline-block px-2 py-1 bg-blue text-center " style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
+                        
+                        Download PDF</button>
+                </>
+            )}
+        </div>
+    );
 };
 
 
