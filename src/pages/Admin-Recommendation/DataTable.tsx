@@ -24,7 +24,7 @@ const DataTable = () => {
   }, []);
 
   const fetchData = async (start = '', end = '') => {
-    let url = `http://127.0.0.1:8000/combined-data/`;
+    let url = import.meta.env.VITE_API_URL + `combined-data/`;
   
     // Format dates to 'YYYY-MM-DD' format
     const formattedStartDate = startDate ? new Date(startDate).toISOString().split('T')[0] : '';

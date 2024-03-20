@@ -130,7 +130,7 @@ const ConversionRateChart = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('http://localhost:8000/conversion-rates/');
+      const response = await fetch(import.meta.env.VITE_API_URL + 'conversion-rates/');
       const data = await response.json();
       const months = data.map(entry => entry.month);
       const rates = data.map(entry => entry.conversion_rate);

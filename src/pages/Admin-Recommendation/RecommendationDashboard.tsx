@@ -3,7 +3,7 @@ import ConversionRateChart from './ConversionRateChart';
 import DataTable from './DataTable';
 
 const fetchMetrics = async (metric) => {
-  const response = await fetch(`http://localhost:8000/metrics/${metric}`);
+  const response = await fetch(import.meta.env.VITE_API_URL + `metrics/${metric}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
