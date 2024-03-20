@@ -174,10 +174,11 @@ const SalesChart: React.FC = () => {
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div ref={chartRef}>
+      <h1 className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1', marginLeft: 400, fontSize: 20 }}>Future Sales Prediction</h1>
         <ReactApexChart options={options} series={series} type="area" height={350} />
       </div>
 
-      <button onClick={downloadPDF} className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-700">
+      <button onClick={downloadPDF} className="inline-block px-2 py-1 bg-blue text-center " style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
         Download PDF
       </button>
     </div>
