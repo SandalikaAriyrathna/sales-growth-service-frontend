@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 
 const Products = () => {
   const [showModal, setShowModal] = React.useState(false);
-  const [modalData, setModalData] = React.useState([]);
+  const [modalData, setModalData] = React.useState<any>({});
   const [optimumPrice, setOptimumPrice] = React.useState(0);
   const [maxMargin, setMaxMargin] = React.useState(0);
   const [minMargin, setMinMargin] = React.useState(0);
@@ -67,20 +67,20 @@ const Products = () => {
       .then((response) => {
         const products = response.data.map((product: any) => {
           return {
-            productId: product[1],
-            productName: product[2],
-            productCost: parseFloat(product[5] ?? 0).toFixed(2),
-            maxProfitMargin: product[7],
-            minProfitMargin: product[8],
+            productId: product['product_id'],
+            productName: product['product_name'],
+            productCost: parseFloat(product['cost'] ?? 0).toFixed(2),
+            maxProfitMargin: product['max_margin'],
+            minProfitMargin: product['min_margin'],
             action: (
               <div className="flex items-center space-x-3.5">
                 <ButtonView
                   onClick={() => {
                     setShowModal(true);
                     setModalData(product);
-                    setOptimumPrice(product[6] ?? 0);
-                    setMaxMargin(product[7] ?? 0);
-                    setMinMargin(product[8] ?? 0);
+                    setOptimumPrice(product['selling_price'] ?? 0);
+                    setMaxMargin(product['max_margin'] ?? 0);
+                    setMinMargin(product['min_margin'] ?? 0);
                   }}
                 />
                 {/* <ButtonDelete onClick={() => console.log(product)} /> */}
@@ -100,9 +100,9 @@ const Products = () => {
     var now = new Date();
     await axios
       .post(import.meta.env.VITE_API_URL + 'optimize', {
-        product: modalData[2],
-        product_category: modalData[3],
-        cost: modalData[5],
+        product: modalData['product_id'],
+        product_category: modalData['product_category'],
+        cost: modalData['cost'],
         date: moment(now).format('YYYY-MM-DD'),
         maxProfitMargin: maxMargin,
         minProfitMargin: minMargin,
@@ -164,7 +164,7 @@ const Products = () => {
                           <label className="mb-3 block text-black dark:text-white flex ">
                             Product ID :{'  '}
                             <h3 className="text-xl font-bold ml-5">
-                              {modalData[1]}
+                              {modalData['product_id']}
                             </h3>
                           </label>
                         </div>
@@ -172,7 +172,7 @@ const Products = () => {
                           <label className="mb-3 block text-black dark:text-white flex ">
                             Product Name :{'  '}
                             <h3 className="text-xl font-bold ml-5">
-                              {modalData[2]}
+                              {modalData['product_name']}
                             </h3>
                           </label>
                         </div>
@@ -180,7 +180,7 @@ const Products = () => {
                           <label className="mb-3 block text-black dark:text-white flex ">
                             Brand :{'  '}
                             <h3 className="text-xl font-bold ml-5">
-                              {modalData[4]}
+                              {modalData['product_brand']}
                             </h3>
                           </label>
                         </div>
@@ -188,7 +188,7 @@ const Products = () => {
                           <label className="mb-3 block text-black dark:text-white flex ">
                             Catogary :{'  '}
                             <h3 className="text-xl font-bold ml-5">
-                              {modalData[3]}
+                              {modalData['product_category']}
                             </h3>
                           </label>
                         </div>
@@ -196,7 +196,7 @@ const Products = () => {
                           <label className="mb-3 block text-black dark:text-white flex ">
                             Cost :{'  '}
                             <h3 className="text-xl font-bold ml-5">
-                              {parseFloat(modalData[5] ?? 0).toFixed(2)}
+                              {parseFloat(modalData['cost'] ?? 0).toFixed(2)}
                             </h3>
                           </label>
                         </div>
@@ -263,9 +263,11 @@ const Products = () => {
                         <div className="flex justify-between items-center mt-4">
                           <p className=" text-xl font-bold text-gray-500 line-through mr-2">
                             <span className="original-price">
-                              {optimumPrice == modalData[6]
+                              {optimumPrice == modalData['selling_price']
                                 ? ''
-                                : parseFloat(modalData[6] ?? 0).toFixed(2)}
+                                : parseFloat(
+                                    modalData['selling_price'] ?? 0,
+                                  ).toFixed(2)}
                             </span>
                           </p>
                           <div className="flex items-center">
@@ -293,7 +295,7 @@ const Products = () => {
                   <button
                     className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => saveProduct(modalData[0])}
+                    onClick={() => saveProduct(modalData['product_id'])}
                   >
                     Save Changes
                   </button>
