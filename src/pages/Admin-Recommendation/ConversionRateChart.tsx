@@ -1,120 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
-
-const options: ApexOptions = {
-  legend: {
-    show: false,
-    position: 'top',
-    horizontalAlign: 'left',
-  },
-  colors: ['#3C50E0', '#80CAEE'],
-  chart: {
-    fontFamily: 'Satoshi, sans-serif',
-    height: 335,
-    type: 'area',
-    dropShadow: {
-      enabled: true,
-      color: '#623CEA14',
-      top: 10,
-      blur: 4,
-      left: 0,
-      opacity: 0.1,
-    },
-
-    toolbar: {
-      show: false,
-    },
-  },
-  responsive: [
-    {
-      breakpoint: 1024,
-      options: {
-        chart: {
-          height: 300,
-        },
-      },
-    },
-    {
-      breakpoint: 1366,
-      options: {
-        chart: {
-          height: 350,
-        },
-      },
-    },
-  ],
-  stroke: {
-    width: [2, 2],
-    curve: 'straight',
-  },
-  // labels: {
-  //   show: false,
-  //   position: "top",
-  // },
-  grid: {
-    xaxis: {
-      lines: {
-        show: true,
-      },
-    },
-    yaxis: {
-      lines: {
-        show: true,
-      },
-    },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  markers: {
-    size: 4,
-    colors: '#fff',
-    strokeColors: ['#3056D3', '#80CAEE'],
-    strokeWidth: 3,
-    strokeOpacity: 0.9,
-    strokeDashArray: 0,
-    fillOpacity: 1,
-    discrete: [],
-    hover: {
-      size: undefined,
-      sizeOffset: 5,
-    },
-  },
-  xaxis: {
-    type: 'category',
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-  },
-  yaxis: {
-    title: {
-      style: {
-        fontSize: '0px',
-      },
-    },
-    min: 0,
-    max: 0.12,
-  },
-};
 
 const ConversionRateChart = () => {
   const [chartData, setChartData] = useState({
-    series: [{
-      name: 'Conversion Rate',
-      data: []  // Data will be an array of conversion rates
-    }],
+    series: [
+      { name: 'Conversion Rate', data: [] },
+      { name: 'Total Trials', data: [] },
+      { name: 'Total Conversions', data: [] }
+    ],
     options: {
       chart: {
-        type: 'line',
+        type: 'area',
         height: 350
       },
       xaxis: {
-        categories: []  // Categories will be an array of months
+        categories: []
       },
       yaxis: {
         title: {
@@ -124,33 +24,48 @@ const ConversionRateChart = () => {
       stroke: {
         curve: 'smooth'
       },
-      // Add more chart options as needed
     }
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(import.meta.env.VITE_API_URL + 'conversion-rates/');
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  const fetchData = async (year) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}conversion-rates/?year=${year}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
       const data = await response.json();
       const months = data.map(entry => entry.month_name);
-      const rates = data.map(entry => entry.conversion_rate);
-      const total_trials = data.map(entry => entry.total_trials);
-      const total_conversions = data.map(entry => entry.total_conversions);
-      
+      const rates = data.map(entry => parseFloat(entry.conversion_rate.toFixed(2)));
+      const total_trials = data.map(entry => parseFloat(entry.total_trials.toFixed(2)));
+      const total_conversions = data.map(entry => parseFloat(entry.total_conversions.toFixed(2)));
+
       setChartData(prevState => ({
         ...prevState,
-        series: [{ name: 'Conversion Rate', data: rates},
-                 { name: 'Total Trials', data: total_trials},
-                 { name: 'Total Conversions', data: total_conversions}],
+        series: [
+          { name: 'Conversion Rate', data: rates },
+          { name: 'Total Trials', data: total_trials },
+          { name: 'Total Conversions', data: total_conversions }
+        ],
         options: {
           ...prevState.options,
           xaxis: { categories: months }
         }
       }));
-    };
+    } catch (error) {
+      console.error('Fetch error:', error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    fetchData(selectedYear);
+  }, [selectedYear]);
+
+  const handleYearChange = (event) => {
+    setSelectedYear(parseInt(event.target.value));
+  };
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
@@ -164,21 +79,23 @@ const ConversionRateChart = () => {
               <p className="font-semibold text-primary">Trial Conversion Rate</p>
             </div>
           </div>
-         
         </div>
-       
+        <div>
+          <label htmlFor="year-select">Year: </label>
+          <select id="year-select" value={selectedYear} onChange={handleYearChange}>
+            {[currentYear - 3, currentYear - 2, currentYear - 1, currentYear, currentYear + 1].map(year => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </div>
       </div>
-
-      <div>
-       
-        <div id="ConversionRateChart"  className="-ml-5">
-      <ReactApexChart
-        options={chartData.options}
-        series={chartData.series}
-        type="area"
-        height={350}
-      />
-    </div>
+      <div id="ConversionRateChart" className="-ml-5">
+        <ReactApexChart
+          options={chartData.options}
+          series={chartData.series}
+          type="area"
+          height={350}
+        />
       </div>
     </div>
   );
