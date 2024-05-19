@@ -12,6 +12,9 @@ const RecommendationDashboard = lazy(() => import('../pages/Admin-Recommendation
 const FuturePredictionDashboard = lazy(() => import('../pages/Admin-SalesForecasting/FuturePredictionDashboard'));
 const SalesbyProductCategory = lazy(() => import('../pages/Admin-SalesForecasting/SalesbyProductCategory'));
 
+
+const MonthlyPromotions = lazy(() => import('../pages/PromotionManagement/MonthlyPromotions'));
+
 const DataStock = lazy(() => import('../pages/DataStock/DataStock'));
 const PriceOptimizationConfig = lazy(
   () => import('../pages/PriceOptimization/PriceOptimizationConfig'),
@@ -95,6 +98,11 @@ const coreRoutes = [
     path: '/products',
     title: 'Products',
     component: Products,
+  },
+  {
+    path: '/monthlyPromotions',
+    title: 'Monthly Promotions',
+    component: MonthlyPromotions,
   },
 ];
 
