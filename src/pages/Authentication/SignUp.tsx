@@ -14,8 +14,8 @@ const SignUp = () => {
                 <img className="dark:hidden" src={LogoDark} alt="Logo" />
               </Link>
               <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
+              E Commerce Sales Growth Optimization Service
+
               </p>
 
               <span className="mt-15 inline-block">

@@ -1,8 +1,40 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import LogoDark from '../../images/logo/logo.png';
 import Logo from '../../images/logo/logo.png';
 
-const SignIn = () => {
+const SignIn = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const response = await fetch('http://localhost:8000/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        username: email,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('Login successful:', data);
+      // Handle successful login, save the token, redirect, etc.
+      onLogin();
+      navigate('/dashboard'); // Redirect to the dashboard
+    } else {
+      console.error('Login failed:', data);
+      // Handle login failure
+    }
+  };
   return (
     <>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -15,8 +47,7 @@ const SignIn = () => {
               </Link>
 
               <p className="2xl:px-20">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                suspendisse.
+                E Commerce Sales Growth Optimization Service
               </p>
 
               <span className="mt-15 inline-block">
@@ -151,15 +182,17 @@ const SignIn = () => {
                 Sign In to QuixellAI
               </h2>
 
-              <form>
-                <div className="mb-4">
+              <form onSubmit={handleSubmit}>
+               <div className="mb-4">
                   <label className="mb-2.5 block font-medium text-black dark:text-white">
                     Email
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
-                      placeholder="Enter your email"
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email or username"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
 
@@ -190,6 +223,8 @@ const SignIn = () => {
                   <div className="relative">
                     <input
                       type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="6+ Characters, 1 Capital letter"
                       className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
