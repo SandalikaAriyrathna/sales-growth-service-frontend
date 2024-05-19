@@ -11,6 +11,7 @@ const Products = () => {
   const [loading, setLoading] = React.useState(false);
   const [verifyingChecked, setVerifyingChecked] = useState<boolean>(false);
   const [callbackUrl, setCallbackUrl] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [autoUpdate, setAutoUpdate] = useState<number>(0);
 
   const handleSubmit = (event) => {
@@ -30,6 +31,7 @@ const Products = () => {
         setIsChecked(config.send_report === 1);
         setVerifyingChecked(config.verifying_required === 1);
         setCallbackUrl(config.price_update_url || '');
+        setEmail(config.email || '');
         setAutoUpdate(config.auto_update || 0);
       } catch (error) {
         setLoading(false);
@@ -51,6 +53,7 @@ const Products = () => {
           verifying_required: verifyingChecked ? 1 : 0,
           price_update_url: callbackUrl,
           auto_update: autoUpdate,
+          email: email,
         },
       );
       setLoading(false);
@@ -82,14 +85,26 @@ const Products = () => {
               }}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-4.5">
+            <label className="mb-2.5 block text-black dark:text-white">
+              Email Address
+            </label>
+            <input
+              type="text"
+              placeholder=""
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          {/* <div className="mb-6">
             <CheckboxTwo
               label="Verifying and Validating Optimized Prices"
               name="product2"
               checked={verifyingChecked}
               onChange={() => setVerifyingChecked(!verifyingChecked)}
             />
-          </div>
+          </div> */}
           <div className="mb-6">
             <label className="mb-2.5 block text-black dark:text-white">
               Auto Update Prices
