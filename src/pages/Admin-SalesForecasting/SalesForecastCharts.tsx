@@ -3,16 +3,51 @@ import ReactApexChart from 'react-apexcharts';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
 interface ChartData {
   name: string;
   data: { x: string; y: number }[];
 }
 
+const Modal = ({ show, message, onClose }) => {
+  if (!show) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 20,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 1000,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      padding: '20px',
+      borderRadius: '10px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      width: '80%',
+      maxWidth: '600px'
+    }}>
+      <div style={{ marginBottom: '10px', fontSize: '16px', textAlign: 'center' }}>{message}</div>
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={onClose} style={{
+          border: 'none',
+          padding: '8px 16px',
+          backgroundColor: '#15cfd1',
+          color: 'white',
+          borderRadius: '5px',
+          cursor: 'pointer',
+          fontSize: '14px'
+        }}>Close</button>
+      </div>
+    </div>
+  );
+};
+
+
 const SalesChart: React.FC = () => {
   const [series, setSeries] = useState<ChartData[]>([]);
-  // const [notification, setNotification] = useState('');
-  const chartRef = useRef(null); // Ref for the chart container
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const chartRef = useRef(null);
+
   const [options, setOptions] = useState({
     legend: {
       show: false,
@@ -81,7 +116,13 @@ const SalesChart: React.FC = () => {
       strokeOpacity: 0.9,
       strokeDashArray: 0,
       fillOpacity: 1,
-      discrete: [],
+      discrete: [{
+        seriesIndex: 0,
+        dataPointIndex: series[0]?.data.length - 1, // This should target the last data point which is predicted sales
+        fillColor: '#FFFF00', // Yellow
+        strokeColor: '#FFFF00', // Yellow
+        size: 6
+      }],
       hover: {
         size: undefined,
         sizeOffset: 5,
@@ -109,38 +150,29 @@ const SalesChart: React.FC = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const rawData = await response.json();
-        // const transformedData = rawData.map((item: any) => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
-        
-        // setSeries([{ name: 'Total Sales', data: transformedData }]);
-         // Assuming last entry is the predicted sales
-         const actualSalesData = rawData.slice(0, -1); // all but the last entry
-         const predictedSalesData = rawData[rawData.length - 1]; // last entry
+        const actualSalesData = rawData.slice(0, -1);
+        const predictedSalesData = rawData[rawData.length - 1];
 
-         // Calculate mean of actual sales
-        const meanActualSales = actualSalesData.reduce((sum, record) => sum + record.total_sales, 0) / actualSalesData.length;
-        // Check if predicted sales is significantly higher or lower than the mean
-        const threshold = 0.1; // e.g., 10%
-        if (predictedSalesData.total_sales < meanActualSales * (1 - threshold)) {
-          alert('The predicted sales for the upcoming month is significantly lower than the average.');
-        } else if (predictedSalesData.total_sales > meanActualSales * (1 + threshold)) {
-          alert('The predicted sales for the upcoming month is significantly higher than the average.');
+        const meanActualSales = actualSalesData.reduce((sum: any, record: { total_sales: any; }) => sum + record.total_sales, 0) / actualSalesData.length;
+        if (predictedSalesData.total_sales < meanActualSales * (1 - 0.1)) {
+          setModalMessage('The predicted sales for the upcoming month are significantly lower than the average.');
+          setModalVisible(true);
+        } else if (predictedSalesData.total_sales > meanActualSales * (1 + 0.1)) {
+          setModalMessage('The predicted sales for the upcoming month are significantly higher than the average.');
+          setModalVisible(true);
         }
 
-        // Transform data for chart
-        const transformedData = rawData.map(item => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
+        const transformedData = rawData.map((item: { sale_year: any; sale_month: any; total_sales: any; }) => ({ x: `${item.sale_year}-${item.sale_month}`, y: item.total_sales }));
         setSeries([{ name: 'Total Sales', data: transformedData }]);
-
-        
-        // Update options to highlight the last point
-        setOptions(prevOptions => ({
+        setOptions((prevOptions) => ({
           ...prevOptions,
           markers: {
             ...prevOptions.markers,
             discrete: [{
               seriesIndex: 0,
-              dataPointIndex: transformedData.length - 1,
-              fillColor: '#eeff00',
-              strokeColor: '#eeff00',
+              dataPointIndex: transformedData.length - 1, // Target the last point specifically
+              fillColor: '#FFFF00', // Yellow color for the predicted sales marker
+              strokeColor: '#FFFF00', // Ensure the stroke is also yellow
               size: 6
             }]
           }
@@ -173,12 +205,12 @@ const SalesChart: React.FC = () => {
 
   return (
     <div className="col-span-12 rounded-sm border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark">
+      {isModalVisible && <Modal show={isModalVisible} message={modalMessage} onClose={() => setModalVisible(false)} />}
       <div ref={chartRef}>
-      <h1 className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1', marginLeft: 400, fontSize: 20 }}>Future Sales Prediction</h1>
+        <h1 className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1', marginLeft: 400, fontSize: 20 }}>Future Sales Prediction</h1>
         <ReactApexChart options={options} series={series} type="area" height={350} />
       </div>
-
-      <button onClick={downloadPDF} className="inline-block px-2 py-1 bg-blue text-center " style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
+      <button onClick={downloadPDF} className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
         Download PDF
       </button>
     </div>
