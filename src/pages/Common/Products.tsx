@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/DataTable';
 import ButtonView from '../../components/ButtonView';
-import ButtonDelete from '../../components/ButtonDelete';
 import Breadcrumb from '../../components/Breadcrumb';
 import axios from 'axios';
 import moment from 'moment';
 import toast from 'react-hot-toast';
+import CheckboxTwo from '../../components/CheckboxTwo';
 
 const Products = () => {
   const [showModal, setShowModal] = React.useState(false);
   const [modalData, setModalData] = React.useState<any>({});
-  const [optimumPrice, setOptimumPrice] = React.useState(0);
+  const [optimumPrice, setOptimumPrice] = React.useState<any>(0);
   const [maxMargin, setMaxMargin] = React.useState(0);
   const [minMargin, setMinMargin] = React.useState(0);
 
@@ -78,7 +78,7 @@ const Products = () => {
                   onClick={() => {
                     setShowModal(true);
                     setModalData(product);
-                    setOptimumPrice(product['selling_price'] ?? 0);
+                    setOptimumPrice(-1);
                     setMaxMargin(product['max_margin'] ?? 0);
                     setMinMargin(product['min_margin'] ?? 0);
                   }}
@@ -200,6 +200,16 @@ const Products = () => {
                             </h3>
                           </label>
                         </div>
+                        <div className="w-full">
+                          <label className="mb-3 block text-black dark:text-white flex ">
+                            Current Selling Price :{'  '}
+                            <h3 className="text-xl font-bold ml-5">
+                              {parseFloat(
+                                modalData['selling_price'] ?? 0,
+                              ).toFixed(2)}
+                            </h3>
+                          </label>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="w-full">
                             <label className="mb-3 block text-black dark:text-white">
@@ -244,7 +254,7 @@ const Products = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="w-full mt-5">
+                        {/* <div className="w-full mt-5">
                           <label className="mb-3 block text-black dark:text-white">
                             Selling Price
                           </label>
@@ -259,9 +269,41 @@ const Products = () => {
                             value={optimumPrice}
                             className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                           />
-                        </div>
+                        </div> */}
+                        {/* <div className="w-full mt-5">
+                            <div className="mb-6">
+                                <CheckboxTwo
+                                label="Update current price"
+                                name="product2"
+                                />
+                            </div>
+                            </div> */}
+                        {/* {optimumPrice != -1 && (
+                          <div className="w-full mt-3">
+                            <label className="mb-3 block text-black dark:text-white flex ">
+                              Optimum Selling Price :{'  '}
+                              <h3 className="text-xl font-bold ml-5">
+                                {optimumPrice == -1
+                                  ? ''
+                                  : parseFloat(optimumPrice ?? 0).toFixed(2)}
+                              </h3>
+                            </label>
+                          </div>
+                        )} */}
                         <div className="flex justify-between items-center mt-4">
-                          <p className=" text-xl font-bold text-gray-500 line-through mr-2">
+                          <div className="w-full mt-3">
+                            {optimumPrice != -1 && (
+                              <label className="mb-3 block text-black dark:text-white flex ">
+                                Optimum Selling Price :{'  '}
+                                <h3 className="text-xl text-green font-bold ml-5">
+                                  {optimumPrice == -1
+                                    ? ''
+                                    : parseFloat(optimumPrice ?? 0).toFixed(2)}
+                                </h3>
+                              </label>
+                            )}
+                          </div>
+                          {/* <p className=" text-xl font-bold text-gray-500 line-through mr-2">
                             <span className="original-price">
                               {optimumPrice == modalData['selling_price']
                                 ? ''
@@ -269,13 +311,13 @@ const Products = () => {
                                     modalData['selling_price'] ?? 0,
                                   ).toFixed(2)}
                             </span>
-                          </p>
+                          </p> */}
                           <div className="flex items-center">
                             <button
                               onClick={() => getOptimumPrice()}
                               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             >
-                              Optimum Price
+                              Get Optimum Price
                             </button>
                           </div>
                         </div>
