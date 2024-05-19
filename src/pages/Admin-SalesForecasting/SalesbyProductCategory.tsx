@@ -5,50 +5,57 @@ import jsPDF from 'jspdf';
 
 const SalesByProductCategory = () => {
     const chartRef = useRef(null);
-  // Define a color palette with 26 distinct colors
-  const colors = [
-    '#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
-    '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
-    '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A', 
-    '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
-    '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC', 
-    '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
-    '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680', 
-    '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
-    '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3', 
-    '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF',
-  ];
+    // Define a color palette with 26 distinct colors
+    const colors = [
+        '#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6',
+        '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D',
+        '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A',
+        '#FF99E6', '#CCFF1A', '#FF1A66', '#E6331A', '#33FFCC',
+        '#66994D', '#B366CC', '#4D8000', '#B33300', '#CC80CC',
+        '#66664D', '#991AFF', '#E666FF', '#4DB3FF', '#1AB399',
+        '#E666B3', '#33991A', '#CC9999', '#B3B31A', '#00E680',
+        '#4D8066', '#809980', '#E6FF80', '#1AFF33', '#999933',
+        '#FF3380', '#CCCC00', '#66E64D', '#4D80CC', '#9900B3',
+        '#E64D66', '#4DB380', '#FF4D4D', '#99E6E6', '#6666FF',
+    ];
 
-   const [chartOptions, setChartOptions] = useState({
+    const [chartOptions, setChartOptions] = useState({
         colors: colors,
         chart: {
-            type: 'pie',
+            type: 'bar',
         },
-        labels: [],
+        xaxis: {
+            categories: [],
+            title: {
+                text: 'Product Categories',
+            },
+        },
+        yaxis: {
+            title: {
+                text: 'Total Sales ($)',
+            },
+            labels: {
+                formatter: (value) => `$${value.toFixed(2)}`,
+            },
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '55%',
+                endingShape: 'rounded'
+            },
+        },
+        dataLabels: {
+            enabled: true,
+        },
         legend: {
             position: 'bottom',
             horizontalAlign: 'center',
         },
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }],
-        dataLabels: {
-            enabled: true,
-        },
         tooltip: {
             y: {
-                formatter: (value) => `$${value.toFixed(2)}`
-            }
-        },
-        plotOptions: {
-            pie: {
-                expandOnClick: true
-            }
+                formatter: (value) => `$${value.toFixed(2)}`,
+            },
         },
     });
     const [chartSeries, setChartSeries] = useState([]);
@@ -62,9 +69,15 @@ const SalesByProductCategory = () => {
                 const data = await response.json();
                 setChartOptions(prevOptions => ({
                     ...prevOptions,
-                    labels: data.map(item => item.product_category)
+                    xaxis: {
+                        ...prevOptions.xaxis,
+                        categories: data.map(item => item.product_category),
+                    }
                 }));
-                setChartSeries(data.map(item => item.total_sales));
+                setChartSeries([{
+                    name: 'Total Sales',
+                    data: data.map((item: { total_sales: any; }) => item.total_sales),
+                }]);
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -98,17 +111,16 @@ const SalesByProductCategory = () => {
                     <ReactApexChart
                         options={chartOptions}
                         series={chartSeries}
-                        type="pie"
+                        type="bar"
                         width="80%"
                     />
-                    <button onClick={downloadPdf} className="inline-block px-2 py-1 bg-blue text-center " style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
-                        
-                        Download PDF</button>
+                    <button onClick={downloadPdf} className="inline-block px-2 py-1 bg-blue text-center" style={{ color: '#15cfd1', marginTop: 30, marginLeft: 1000 }}>
+                        Download PDF
+                    </button>
                 </>
             )}
         </div>
     );
 };
-
 
 export default SalesByProductCategory;
