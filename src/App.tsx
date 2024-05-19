@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import ECommerce from './pages/Dashboard/ECommerce';
@@ -15,10 +15,15 @@ const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 1000);
   }, []);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   return loading ? (
     <Loader />
@@ -30,12 +35,16 @@ function App() {
         containerClassName="overflow-auto"
       />
       <Routes>
-        <Route path="/auth/signin" element={<SignIn />} />
+        <Route path="/" element={<SignIn onLogin={handleLogin} />} />
+        <Route path="/auth/signin" element={<SignIn onLogin={handleLogin} />} />
         <Route path="/auth/signup" element={<SignUp />} />
         <Route element={<DefaultLayout />}>
-          <Route index element={<ECommerce />} />
-          {routes.map((routes, index) => {
-            const { path, component: Component } = routes;
+          <Route
+            path="/dashboard"
+            element={isAuthenticated ? <ECommerce /> : <SignIn onLogin={handleLogin} />}
+          />
+          {routes.map((route, index) => {
+            const { path, component: Component } = route;
             return (
               <Route
                 key={index}

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ConversionRateChart from './ConversionRateChart';
-import DataTable from './DataTable';
 
 const fetchMetrics = async (metric) => {
   const response = await fetch(import.meta.env.VITE_API_URL + `metrics/${metric}`);
