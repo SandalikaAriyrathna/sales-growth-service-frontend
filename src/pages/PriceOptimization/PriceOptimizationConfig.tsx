@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
 import CheckboxTwo from '../../components/CheckboxTwo';
+import React from 'react';
 
 const Products = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
@@ -18,18 +19,13 @@ const Products = () => {
           />
         </div>
         <div className="mb-6">
-          <CheckboxTwo label="Automatically Sync" name="product3" />
-        </div>
-        <div className="mb-6">
           <label className="mb-2.5 block text-black dark:text-white">
             Automatically generate
           </label>
           <div className="relative z-20 bg-transparent dark:bg-form-input">
             <select className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary">
-              <option value="">Per Month (All products)</option>
-              <option value="">Per Month (Selected products)</option>
-              <option value="">Per Week (All products)</option>
-              <option value="">Per Week (Selected products)</option>
+              <option value="1">Per Month (All products)</option>
+              <option value="2">Per Week (All products)</option>
             </select>
             <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
               <svg
