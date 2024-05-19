@@ -6,14 +6,18 @@ import axios from 'axios';
 import moment from 'moment';
 import toast from 'react-hot-toast';
 import CheckboxTwo from '../../components/CheckboxTwo';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
 
+import Loading from 'react-fullscreen-loading';
 const Products = () => {
   const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [modalData, setModalData] = React.useState<any>({});
   const [optimumPrice, setOptimumPrice] = React.useState<any>(0);
   const [maxMargin, setMaxMargin] = React.useState(0);
   const [minMargin, setMinMargin] = React.useState(0);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(10);
   const [headings, setHeadings] = useState([
     {
       title: 'Product ID',
@@ -44,6 +48,7 @@ const Products = () => {
   const [data, setData] = useState([]);
 
   const saveProduct = async (id: any) => {
+    setLoading(true);
     await axios
       .put(import.meta.env.VITE_API_URL + 'products/' + id, {
         max_margin: maxMargin,
@@ -52,20 +57,84 @@ const Products = () => {
       })
       .then((response) => {
         toast.success('Product updated successfully');
+        setLoading(false);
         setShowModal(false);
         getAllProducts();
       })
       .catch((error) => {
+        setLoading(false);
         console.log(error);
         toast.error('Error occured while updating product');
       });
   };
+  useEffect(() => {
+    getAllProducts(currentPage);
+  }, [currentPage]);
 
-  const getAllProducts = async () => {
+  const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const maxPagesToShow = 5; // Adjust this to show more or fewer pages around the current page
+
+    // Add the first page
+    const pageNumbers: number[] = [];
+
+    if (currentPage > 1) {
+      pageNumbers.push(1);
+    }
+
+    // Add the previous pages
+    for (let i = currentPage - 2; i < currentPage; i++) {
+      if (i > 1) {
+        pageNumbers.push(i);
+      }
+    }
+
+    // Add the current page
+    pageNumbers.push(currentPage);
+
+    // Add the next pages
+    for (let i = currentPage + 1; i <= currentPage + 2 && i < totalPages; i++) {
+      pageNumbers.push(i);
+    }
+
+    // Add the last page
+    if (currentPage < totalPages) {
+      pageNumbers.push(totalPages);
+    }
+
+    return (
+      <nav>
+        <ul className="pagination flex justify-center space-x-2 mt-4">
+          {pageNumbers.map((number) => (
+            <li
+              key={number}
+              className={`page-item ${number === currentPage ? 'active' : ''}`}
+            >
+              <button
+                onClick={() => onPageChange(number)}
+                className="page-link bg-white dark:bg-black  border border-gray-300 px-3 py-1 rounded hover:bg-gray-200"
+              >
+                {number}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    );
+  };
+
+  const getAllProducts = async (page = 1) => {
+    setLoading(true);
     await axios
-      .get(import.meta.env.VITE_API_URL + 'products')
+      .get(import.meta.env.VITE_API_URL + 'products', {
+        params: { page, limit: productsPerPage },
+      })
       .then((response) => {
-        const products = response.data.map((product: any) => {
+        setTotalPages(
+          response.data.count > 0
+            ? Math.ceil(response.data.count / productsPerPage)
+            : 0,
+        );
+        const products = response.data.data.map((product: any) => {
           return {
             productId: product['product_id'],
             productName: product['product_name'],
@@ -89,6 +158,12 @@ const Products = () => {
           };
         });
         setData(products);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+        toast.error('Error occured while fetching products');
       });
   };
 
@@ -96,8 +171,16 @@ const Products = () => {
     getAllProducts();
   }, []);
 
+  const [totalPages, setTotalPages] = useState(1);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    getAllProducts(page);
+  };
+
   const getOptimumPrice = async () => {
     var now = new Date();
+    setLoading(true);
     await axios
       .post(import.meta.env.VITE_API_URL + 'optimize', {
         product: modalData['product_id'],
@@ -108,20 +191,31 @@ const Products = () => {
         minProfitMargin: minMargin,
       })
       .then((response) => {
-        toast.success('Optimum price calculated');
+        // toast.success('Optimum price calculated');
         setOptimumPrice(response.data);
+        setLoading(false);
+        Swal.fire({
+          title: 'Success!',
+          html:
+            'Optimum price calculated successfully <br> Optimum price is <strong>' +
+            parseFloat(response.data).toFixed(2) +
+            '</strong>',
+          icon: 'success',
+        });
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false);
         toast.error('Error occured while calculating optimum price');
       });
   };
 
   return (
     <>
-      <Breadcrumb pageName="Products" />
-      <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-        {/* <button className="flex items-center gap-2 rounded bg-primary py-2 px-4.5 font-medium text-white hover:bg-opacity-80">
+      {loading && (
+        <Loading loading background="#ababab8a" loaderColor="#3498db" />
+      )}
+      {/* <button className="flex items-center gap-2 rounded bg-primary py-2 px-4.5 font-medium text-white hover:bg-opacity-80">
           <svg
             className="fill-current"
             width="16"
@@ -137,11 +231,18 @@ const Products = () => {
           </svg>
           Add task
         </button> */}
+      <Breadcrumb pageName="Products" />
+      <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
         <DataTable headings={headings} data={data} />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
       {showModal ? (
         <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed bg-[#ffffff40]  inset-0 z-[10000] outline-none focus:outline-none ">
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed bg-[#ffffff40]  inset-0 z-[1997] outline-none focus:outline-none ">
             <div className="relative w-auto my-6 mx-auto max-w-3xl opacity-100">
               {/*content*/}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white dark:bg-boxdark outline-none focus:outline-none">
@@ -292,16 +393,14 @@ const Products = () => {
                         )} */}
                         <div className="flex justify-between items-center mt-4">
                           <div className="w-full mt-3">
-                            {optimumPrice != -1 && (
-                              <label className="mb-3 block text-black dark:text-white flex ">
-                                Optimum Selling Price :{'  '}
-                                <h3 className="text-xl text-green font-bold ml-5">
-                                  {optimumPrice == -1
-                                    ? ''
-                                    : parseFloat(optimumPrice ?? 0).toFixed(2)}
-                                </h3>
-                              </label>
-                            )}
+                            <label className="mb-3 block text-black dark:text-white flex ">
+                              Optimum Selling Price :{'  '}
+                              <h3 className="text-xl text-green font-bold ml-5">
+                                {optimumPrice == -1
+                                  ? 'Not calculated yet'
+                                  : parseFloat(optimumPrice ?? 0).toFixed(2)}
+                              </h3>
+                            </label>
                           </div>
                           {/* <p className=" text-xl font-bold text-gray-500 line-through mr-2">
                             <span className="original-price">
@@ -315,7 +414,7 @@ const Products = () => {
                           <div className="flex items-center">
                             <button
                               onClick={() => getOptimumPrice()}
-                              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                              className="bg-green-500 hover:bg-green-700 text-black dark:text-white font-bold py-2 px-4 rounded focus:outline focus:shadow-outline"
                             >
                               Get Optimum Price
                             </button>

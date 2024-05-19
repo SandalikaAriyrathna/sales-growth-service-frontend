@@ -7,6 +7,9 @@ import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
 import Loader from './common/Loader';
 import routes from './routes';
+import React from 'react';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/src/sweetalert2.scss';
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 
