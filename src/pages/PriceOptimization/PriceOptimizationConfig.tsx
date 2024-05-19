@@ -4,37 +4,45 @@ import CheckboxTwo from '../../components/CheckboxTwo';
 import React from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Loading from 'react-fullscreen-loading';
 
 const Products = () => {
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [loading, setLoading] = React.useState(false);
   const [verifyingChecked, setVerifyingChecked] = useState<boolean>(false);
   const [callbackUrl, setCallbackUrl] = useState<string>('');
+  const [autoUpdate, setAutoUpdate] = useState<number>(0);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     saveConfiguration();
   };
 
-    useEffect(() => {
-      const fetchConfiguration = async () => {
-        try {
-          const response = await axios.get(
-            import.meta.env.VITE_API_URL + 'config/op_configuration/1',
-          );    
-          const config = response.data;
-          setIsChecked(config.send_report === 1);
-          setVerifyingChecked(config.verifying_required === 1);
-          setCallbackUrl(config.price_update_url || '');
-        } catch (error) {
-          toast.error('Error occurred while fetching configuration');
-          console.error(error);
-        }
-      };
+  useEffect(() => {
+    const fetchConfiguration = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          import.meta.env.VITE_API_URL + 'config/op_configuration/1',
+        );
+        const config = response.data;
+        setLoading(false);
+        setIsChecked(config.send_report === 1);
+        setVerifyingChecked(config.verifying_required === 1);
+        setCallbackUrl(config.price_update_url || '');
+        setAutoUpdate(config.auto_update || 0);
+      } catch (error) {
+        setLoading(false);
+        toast.error('Error occurred while fetching configuration');
+        console.error(error);
+      }
+    };
 
-      fetchConfiguration();
-    }, []);
+    fetchConfiguration();
+  }, []);
 
   const saveConfiguration = async () => {
+    setLoading(true);
     try {
       const response = await axios.put(
         import.meta.env.VITE_API_URL + 'config/op_configuration/1',
@@ -42,10 +50,13 @@ const Products = () => {
           send_report: isChecked ? 1 : 0,
           verifying_required: verifyingChecked ? 1 : 0,
           price_update_url: callbackUrl,
+          auto_update: autoUpdate,
         },
       );
+      setLoading(false);
       toast.success('Configuration updated successfully');
     } catch (error) {
+      setLoading(false);
       toast.error('Error occurred while updating configuration');
       console.error(error);
     }
@@ -53,20 +64,27 @@ const Products = () => {
 
   return (
     <>
+      {loading && (
+        <Loading loading background="#ababab8a" loaderColor="#3498db" />
+      )}
       <form onSubmit={handleSubmit}>
         <Breadcrumb pageName="Price Optimization Configuration" />
         <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
           <div className="mb-6">
             <CheckboxTwo
-              label="Send a report email"
+              label="Send a Report Email"
               name="report"
               checked={isChecked}
-              onChange={() => setIsChecked(!isChecked)}
+              onChange={() => {
+                console.log(isChecked);
+
+                setIsChecked(!isChecked);
+              }}
             />
           </div>
           <div className="mb-6">
             <CheckboxTwo
-              label="Verifying and validating the optimized prices required"
+              label="Verifying and Validating Optimized Prices"
               name="product2"
               checked={verifyingChecked}
               onChange={() => setVerifyingChecked(!verifyingChecked)}
@@ -74,15 +92,17 @@ const Products = () => {
           </div>
           <div className="mb-6">
             <label className="mb-2.5 block text-black dark:text-white">
-              Automatically generate
+              Auto Update Prices
             </label>
             <div className="relative z-20 bg-transparent dark:bg-form-input">
               <select
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                onChange={(e) => setCallbackUrl(e.target.value)}
+                value={autoUpdate}
+                onChange={(e) => setAutoUpdate(parseInt(e.target.value))}
               >
-                <option value="1">Per Month (All products)</option>
-                <option value="2">Per Week (All products)</option>
+                <option value={0}>Disabled</option>
+                <option value={1}>Per Month (All products)</option>
+                <option value={2}>Per Week (All products)</option>
               </select>
               <span className="absolute top-1/2 right-4 z-30 -translate-y-1/2">
                 <svg
@@ -107,7 +127,7 @@ const Products = () => {
           </div>
           <div className="mb-4.5">
             <label className="mb-2.5 block text-black dark:text-white">
-              Callback URL
+              Price Update Endpoint
             </label>
             <input
               type="text"
@@ -117,7 +137,10 @@ const Products = () => {
               onChange={(e) => setCallbackUrl(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="flex justify-center items-center rounded bg-primary p-3 font-medium text-gray"
+          >
             Save Configuration
           </button>
         </div>
