@@ -414,9 +414,9 @@ const Products = () => {
                           <div className="flex items-center">
                             <button
                               onClick={() => getOptimumPrice()}
-                              className="bg-green-500 hover:bg-green-700 text-black dark:text-white font-bold py-2 px-4 rounded focus:outline focus:shadow-outline"
+                              className="bg-white dark:bg-black  border border-gray-300 hover:bg-green-700 text-black dark:text-white font-bold py-2 px-4 rounded focus:outline focus:shadow-outline"
                             >
-                              Get Optimum Price
+                              Calculate Optimum Price
                             </button>
                           </div>
                         </div>
