@@ -119,7 +119,11 @@ const SalesByProductCategory = () => {
                     </button>
                 </>
             )}
+
+            
         </div>
+
+        
     );
 };
 
