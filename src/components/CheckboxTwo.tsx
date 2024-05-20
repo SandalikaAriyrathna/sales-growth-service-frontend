@@ -1,9 +1,17 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-const CheckboxTwo = (props?: any) => {
-  const { label = 'Default Label', name = 'default_name' } = props;
-  const [isChecked, setIsChecked] = useState<boolean>(false);
+const CheckboxTwo = ({
+  label = 'Default Label',
+  name = 'default_name',
+  checked,
+  onChange,
+}) => {
+  const handleCheckboxChange = () => {
+    if (onChange) {
+      onChange(!checked);
+    }
+  };
 
   return (
     <div>
@@ -16,16 +24,15 @@ const CheckboxTwo = (props?: any) => {
             type="checkbox"
             id={name}
             className="sr-only"
-            onChange={() => {
-              setIsChecked(!isChecked);
-            }}
+            checked={checked}
+            onChange={handleCheckboxChange}
           />
           <div
             className={`mr-4 flex h-5 w-5 items-center justify-center rounded border ${
-              isChecked && 'border-primary bg-gray dark:bg-transparent'
+              checked ? 'border-primary bg-gray dark:bg-transparent' : ''
             }`}
           >
-            <span className={`opacity-0 ${isChecked && '!opacity-100'}`}>
+            <span className={`opacity-0 ${checked ? '!opacity-100' : ''}`}>
               <svg
                 width="11"
                 height="8"
@@ -47,6 +54,13 @@ const CheckboxTwo = (props?: any) => {
       </label>
     </div>
   );
+};
+
+CheckboxTwo.propTypes = {
+  label: PropTypes.string,
+  name: PropTypes.string,
+  checked: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default CheckboxTwo;
