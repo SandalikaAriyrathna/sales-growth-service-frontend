@@ -1,3 +1,4 @@
+import React from 'react';
 import SalesChart from './SalesForecastCharts.tsx';
 import SalesTrends from './SalesTrends.tsx';
 // import SalesbyProductCategory from './SalesbyProductCategory.tsx';
